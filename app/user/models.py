@@ -1,14 +1,19 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, BaseUserManager
 from django.db import models
+
+from core.managers.soft_delete import SoftDeletionManager, DeletedObjectsManager
+from core.abstract_models import SoftDeletableModel
+
+
 # Create your models here.
 
 
-class UserManager(BaseUserManager):
+class UserManager(SoftDeletionManager, BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         """Create, save and return a new user."""
         if not email:
-            raise ValueError('User must have an email address.')
+            raise ValueError("User must have an email address.")
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -25,7 +30,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin, SoftDeletableModel):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
@@ -33,4 +38,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    all_objects = models.Manager()
+
+    deleted_objects = DeletedObjectsManager()
+
+    USERNAME_FIELD = "email"
