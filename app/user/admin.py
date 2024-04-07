@@ -58,5 +58,8 @@ class UserAdmin(BaseUserAdmin):
 
     list_filter = (DeletedFilter,)
 
+    def get_object(self, request, object_id, from_field=None):
+        return User.all_objects.get(pk=object_id)
+
 
 admin.site.register(User, UserAdmin)

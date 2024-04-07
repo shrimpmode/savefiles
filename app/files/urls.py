@@ -1,14 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-
-from . import views
-
-app_name = "user"
-
+from .views import folder_views
 router = DefaultRouter()
-router.register('users', views.UserViewSet)
+
+print('test')
 
 urlpatterns = [
-    path("token/", views.CreateTokenView.as_view(), name="token"),
+    path('folder/<int:folder_id>/content/', folder_views.FolderFilesViews.as_view(), name='folder_files'),
     path('', include(router.urls)),
 ]
